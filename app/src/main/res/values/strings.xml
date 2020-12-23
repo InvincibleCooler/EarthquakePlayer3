@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">EarthQuakePlayer3</string>
+
+    <string name="common_song">곡</string>
+    <string name="common_video">영상</string>
+    <string name="common_setting">설정</string>
+
+    <string name="dialog_notice">안내</string>
+    <string name="dialog_request">요청</string>
+    <string name="dialog_cancel">취소</string>
+    <string name="dialog_permission_body">앱의 사용을 위해서는 미디어 접근 권한이 필요합니다.\n[다시보지않기]를 설정하신 경우에는 앱정보>권한 승인 후 이용해주세요.\n\n취소 시에는 앱이 종료 됩니다.</string>
+</resources>
