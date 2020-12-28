@@ -5,13 +5,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.eq.earthquakeplayer3.BaseFragment
 import com.eq.earthquakeplayer3.R
+import com.eq.earthquakeplayer3.utils.ScreenUtils
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import nl.joery.animatedbottombar.AnimatedBottomBar
 
@@ -29,13 +29,16 @@ class MainFragment : BaseFragment() {
 
     // related to player Ui
     private lateinit var miniPlayerLayout: View
-    private lateinit var closeIv: ImageView
+    private lateinit var closeLayout: View
 
     private var panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+
+    private var bottomBarHeight = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pagerAdapter = MainPagerAdapter(childFragmentManager)
+        bottomBarHeight = ScreenUtils.dipToPixel(context, 62f).toFloat()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -54,11 +57,15 @@ class MainFragment : BaseFragment() {
                     miniPlayerLayout.run {
                         alpha = (1 - slideOffset)
                     }
-                    Log.d(TAG, "onPanelSlide offset : $slideOffset")
+                    closeLayout.run {
+                        alpha = slideOffset
+                    }
+                    bottomBar.run {
+                        translationY = bottomBarHeight * slideOffset
+                    }
                 }
 
                 override fun onPanelStateChanged(panel: View?, previousState: SlidingUpPanelLayout.PanelState?, newState: SlidingUpPanelLayout.PanelState?) {
-//                    Log.d(TAG, "onPanelStateChanged previousState : $previousState, newState : $newState")
                     when (newState) {
                         SlidingUpPanelLayout.PanelState.COLLAPSED -> {
                             setClickEnable(true)
@@ -74,7 +81,7 @@ class MainFragment : BaseFragment() {
                 }
             })
 
-            setFadeOnClickListener {
+            setFadeOnClickListener { // v 버튼 더블클릭 방지 차원
                 click2Collapsed()
             }
         }
@@ -88,14 +95,17 @@ class MainFragment : BaseFragment() {
         bottomBar = view.findViewById(R.id.bottom_bar)
 
         miniPlayerLayout = view.findViewById(R.id.mini_player_layout)
-        closeIv = view.findViewById(R.id.close_iv)
-        closeIv.run {
+        closeLayout = view.findViewById(R.id.close_layout)
+        closeLayout.run {
             setOnClickListener {
                 click2Collapsed()
             }
         }
 
         bottomBar.setupWithViewPager(viewPager)
+
+        // UI refresh
+        setLayout()
     }
 
     private inner class MainPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
@@ -111,8 +121,6 @@ class MainFragment : BaseFragment() {
 
     private fun setClickEnable(clickable: Boolean) {
         slidingLayout.run {
-            isEnabled = clickable
-            isClickable = clickable
             isTouchEnabled = clickable
         }
     }
@@ -120,5 +128,34 @@ class MainFragment : BaseFragment() {
     private fun click2Collapsed() {
         setClickEnable(true)
         slidingLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+    }
+
+    /**
+     * mini player
+     * close 버튼
+     * bottomBar는 애니메이션 처리가 있기 때문에 재설정이 필요함.
+     */
+    private fun setLayout() {
+        miniPlayerLayout.run {
+            if (panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+                alpha = 1f
+            } else if (panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                alpha = 0f
+            }
+        }
+        closeLayout.run {
+            if (panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+                alpha = 0f
+            } else if (panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                alpha = 1f
+            }
+        }
+        bottomBar.run {
+            if (panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+                translationY = 0f
+            } else if (panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                translationY = bottomBarHeight
+            }
+        }
     }
 }

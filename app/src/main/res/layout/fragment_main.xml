@@ -21,20 +21,29 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#f0f">
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/song_player_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="52dp" />
 
             <include android:id="@+id/mini_player_layout"
                 layout="@layout/miniplayer_laytout"/>
 
-            <ImageView
-                android:id="@+id/close_iv"
+            <FrameLayout
+                android:id="@+id/close_layout"
                 android:layout_width="52dp"
                 android:layout_height="52dp"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="center"
-                android:src="@drawable/btn_player_gnb_down" />
+                android:layout_alignParentEnd="true">
 
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/player_hide" />
+            </FrameLayout>
         </RelativeLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
