@@ -13,7 +13,7 @@ import com.eq.earthquakeplayer3.async.CoroutineAsyncTaskWrapper
 import com.eq.earthquakeplayer3.data.SongData
 
 
-class SongListViewModel(private val app: Application) : AndroidViewModel(app) {
+class SongListViewModel(app: Application) : AndroidViewModel(app) {
     companion object {
         private const val TAG = "SongListViewModel"
 
@@ -89,7 +89,6 @@ class SongListViewModel(private val app: Application) : AndroidViewModel(app) {
         }
 
         override fun postTask(result: ArrayList<SongData>?) {
-            Log.d(TAG, "postTask : ${result?.size}")
             dataList.postValue(result)
             isLoading.postValue(false)
         }

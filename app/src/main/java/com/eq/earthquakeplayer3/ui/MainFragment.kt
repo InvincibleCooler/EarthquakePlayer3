@@ -1,15 +1,16 @@
 package com.eq.earthquakeplayer3.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.eq.earthquakeplayer3.BaseFragment
+import com.eq.earthquakeplayer3.MainActivity
 import com.eq.earthquakeplayer3.R
 import com.eq.earthquakeplayer3.utils.ScreenUtils
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -31,14 +32,18 @@ class MainFragment : BaseFragment() {
     private lateinit var miniPlayerLayout: View
     private lateinit var closeLayout: View
 
-    private var panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-
     private var bottomBarHeight = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pagerAdapter = MainPagerAdapter(childFragmentManager)
         bottomBarHeight = ScreenUtils.dipToPixel(context, 62f).toFloat()
+
+        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                performBackPress()
+            }
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -69,11 +74,9 @@ class MainFragment : BaseFragment() {
                     when (newState) {
                         SlidingUpPanelLayout.PanelState.COLLAPSED -> {
                             setClickEnable(true)
-                            panelState = newState
                         }
                         SlidingUpPanelLayout.PanelState.EXPANDED -> {
                             setClickEnable(false)
-                            panelState = newState
                         }
                         else -> {
                         }
@@ -137,25 +140,35 @@ class MainFragment : BaseFragment() {
      */
     private fun setLayout() {
         miniPlayerLayout.run {
-            if (panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
                 alpha = 1f
-            } else if (panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            } else if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                 alpha = 0f
             }
         }
         closeLayout.run {
-            if (panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
                 alpha = 0f
-            } else if (panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            } else if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                 alpha = 1f
             }
         }
         bottomBar.run {
-            if (panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
                 translationY = 0f
-            } else if (panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            } else if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                 translationY = bottomBarHeight
             }
+        }
+    }
+
+    private fun performBackPress() {
+        if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED
+            || slidingLayout.panelState == SlidingUpPanelLayout.PanelState.ANCHORED
+        ) {
+            slidingLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+        } else {
+            (activity as MainActivity).finish()
         }
     }
 }
