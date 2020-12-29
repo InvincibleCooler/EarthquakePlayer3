@@ -23,14 +23,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <include
-                layout="@layout/song_player_layout"
+            <com.eq.earthquakeplayer3.custom.SongPlayerView
+                android:id="@+id/song_player_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="52dp" />
 
-            <include android:id="@+id/mini_player_layout"
-                layout="@layout/miniplayer_laytout"/>
+            <com.eq.earthquakeplayer3.custom.MiniPlayerView
+                android:id="@+id/mini_player_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <FrameLayout
                 android:id="@+id/close_layout"

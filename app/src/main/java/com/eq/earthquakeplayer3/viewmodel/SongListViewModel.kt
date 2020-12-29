@@ -11,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.eq.earthquakeplayer3.async.CoroutineAsyncTaskWrapper
 import com.eq.earthquakeplayer3.data.SongData
+import com.eq.earthquakeplayer3.data.SongDataMgr
 
 
 class SongListViewModel(app: Application) : AndroidViewModel(app) {
@@ -89,6 +90,7 @@ class SongListViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         override fun postTask(result: ArrayList<SongData>?) {
+            SongDataMgr.songList = result
             dataList.postValue(result)
             isLoading.postValue(false)
         }
