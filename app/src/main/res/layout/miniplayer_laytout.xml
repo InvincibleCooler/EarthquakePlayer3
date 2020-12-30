@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_container"
     android:layout_width="match_parent"
-    android:layout_height="62dp"
+    android:layout_height="@dimen/mini_player_height"
     android:background="@color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="62dp">
+        android:layout_height="@dimen/mini_player_height">
 
         <RelativeLayout
             android:layout_width="match_parent"

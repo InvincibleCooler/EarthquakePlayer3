@@ -20,7 +20,7 @@
         <com.eq.earthquakeplayer3.custom.MiniPlayerView
             android:id="@+id/mini_player_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="@dimen/mini_player_height" />
 
         <FrameLayout
             android:id="@+id/close_layout"

@@ -7,33 +7,28 @@
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/mini_player_height"/>
 
-    <FrameLayout
+    <nl.joery.animatedbottombar.AnimatedBottomBar
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="62dp"
+        android:layout_height="@dimen/bottom_tab_bar_height"
         android:layout_gravity="bottom"
-        android:background="@color/white">
-
-        <nl.joery.animatedbottombar.AnimatedBottomBar
-            android:id="@+id/bottom_bar"
-            android:layout_width="match_parent"
-            android:layout_height="62dp"
-            android:background="@color/white"
-            app:abb_indicatorAppearance="invisible"
-            app:abb_indicatorHeight="4dp"
-            app:abb_indicatorMargin="16dp"
-            app:abb_selectedIndex="0"
-            app:abb_selectedTabType="text"
-            app:abb_tabs="@menu/main_tabs" />
-    </FrameLayout>
+        android:background="@color/white"
+        app:abb_indicatorAppearance="invisible"
+        app:abb_indicatorHeight="4dp"
+        app:abb_indicatorMargin="16dp"
+        app:abb_selectedIndex="0"
+        app:abb_selectedTabType="text"
+        app:abb_tabs="@menu/main_tabs" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/player_wrapper_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="62dp">
+        android:layout_marginBottom="@dimen/bottom_tab_bar_height">
 
         <include
             android:id="@+id/bottom_sheet_player_layout"
