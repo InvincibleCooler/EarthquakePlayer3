@@ -64,6 +64,12 @@ dependencies {
     // sliding up panel for player
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
 
+    // Exo Player
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.11.7'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.11.7'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.11.7'
+    implementation 'com.google.android.exoplayer:extension-mediasession:2.11.1'
+
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
