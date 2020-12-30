@@ -20,9 +20,10 @@ import com.eq.earthquakeplayer3.custom.MiniPlayerView
 import com.eq.earthquakeplayer3.custom.SongPlayerControlView
 import com.eq.earthquakeplayer3.custom.SongPlayerView
 import com.eq.earthquakeplayer3.data.SongData
+import com.eq.earthquakeplayer3.ext.stateName
 import com.eq.earthquakeplayer3.utils.ScreenUtils
 import com.eq.earthquakeplayer3.viewmodel.SongPlayerViewModel
-import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import nl.joery.animatedbottombar.AnimatedBottomBar
 
 
@@ -33,7 +34,7 @@ class MainFragment : BaseFragment() {
 
     private lateinit var pagerAdapter: MainPagerAdapter
 
-    private lateinit var slidingLayout: SlidingUpPanelLayout
+    private lateinit var behavior: BottomSheetBehavior<*>
     private lateinit var viewPager: ViewPager
     private lateinit var bottomBar: AnimatedBottomBar
 
@@ -75,12 +76,13 @@ class MainFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        slidingLayout = view.findViewById(R.id.sliding_layout)
-        slidingLayout.run {
-            setClickEnable(panelState == SlidingUpPanelLayout.PanelState.COLLAPSED)
+        behavior = BottomSheetBehavior.from(view.findViewById(R.id.bottom_sheet_player_layout)).apply {
+            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    Log.d(TAG, "newState : $stateName")
+                }
 
-            addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
-                override fun onPanelSlide(panel: View?, slideOffset: Float) {
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
                     miniPlayerLayout.run {
                         alpha = (1 - slideOffset)
                     }
@@ -91,24 +93,7 @@ class MainFragment : BaseFragment() {
                         translationY = bottomBarHeight * slideOffset
                     }
                 }
-
-                override fun onPanelStateChanged(panel: View?, previousState: SlidingUpPanelLayout.PanelState?, newState: SlidingUpPanelLayout.PanelState?) {
-                    when (newState) {
-                        SlidingUpPanelLayout.PanelState.COLLAPSED -> {
-                            setClickEnable(true)
-                        }
-                        SlidingUpPanelLayout.PanelState.EXPANDED -> {
-                            setClickEnable(false)
-                        }
-                        else -> {
-                        }
-                    }
-                }
             })
-
-            setFadeOnClickListener { // v 버튼 더블클릭 방지 차원
-                click2Collapsed()
-            }
         }
 
         viewPager = view.findViewById(R.id.view_pager)
@@ -121,10 +106,17 @@ class MainFragment : BaseFragment() {
 
         songPlayerLayout = view.findViewById(R.id.song_player_layout)
         miniPlayerLayout = view.findViewById(R.id.mini_player_layout)
+        miniPlayerLayout.run {
+            setOnClickListener {
+                if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED)
+                    click2Collapsed(false)
+            }
+        }
+
         closeLayout = view.findViewById(R.id.close_layout)
         closeLayout.run {
             setOnClickListener {
-                click2Collapsed()
+                click2Collapsed(true)
             }
         }
 
@@ -145,15 +137,8 @@ class MainFragment : BaseFragment() {
         }
     }
 
-    private fun setClickEnable(clickable: Boolean) {
-        slidingLayout.run {
-            isTouchEnabled = clickable
-        }
-    }
-
-    private fun click2Collapsed() {
-        setClickEnable(true)
-        slidingLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+    private fun click2Collapsed(isCollapsed: Boolean) {
+        behavior.state = if (isCollapsed) BottomSheetBehavior.STATE_COLLAPSED else BottomSheetBehavior.STATE_EXPANDED
     }
 
     /**
@@ -162,34 +147,36 @@ class MainFragment : BaseFragment() {
      * bottomBar는 애니메이션 처리가 있기 때문에 재설정이 필요함.
      */
     private fun setLayout() {
+        if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            behavior.peekHeight = bottomBarHeight.toInt()
+        }
+
         miniPlayerLayout.run {
-            if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 alpha = 1f
-            } else if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            } else if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 alpha = 0f
             }
         }
         closeLayout.run {
-            if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 alpha = 0f
-            } else if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            } else if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 alpha = 1f
             }
         }
         bottomBar.run {
-            if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 translationY = 0f
-            } else if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            } else if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 translationY = bottomBarHeight
             }
         }
     }
 
     private fun performBackPress() {
-        if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED
-            || slidingLayout.panelState == SlidingUpPanelLayout.PanelState.ANCHORED
-        ) {
-            slidingLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+        if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
             (activity as MainActivity).finish()
         }

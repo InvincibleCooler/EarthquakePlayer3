@@ -1,66 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.sothree.slidinguppanel.SlidingUpPanelLayout
-        android:id="@+id/sliding_layout"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_bar"
-        android:gravity="bottom"
-        app:umanoOverlay="false"
-        app:umanoPanelHeight="62dp"
-        app:umanoShadowHeight="0dp">
+        android:layout_height="match_parent" />
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/view_pager"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
+        android:layout_gravity="bottom"
+        android:background="@color/white">
+
+        <nl.joery.animatedbottombar.AnimatedBottomBar
+            android:id="@+id/bottom_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="62dp"
+            android:background="@color/white"
+            app:abb_indicatorAppearance="invisible"
+            app:abb_indicatorHeight="4dp"
+            app:abb_indicatorMargin="16dp"
+            app:abb_selectedIndex="0"
+            app:abb_selectedTabType="text"
+            app:abb_tabs="@menu/main_tabs" />
+    </FrameLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.eq.earthquakeplayer3.custom.SongPlayerView
-                android:id="@+id/song_player_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="52dp" />
-
-            <com.eq.earthquakeplayer3.custom.MiniPlayerView
-                android:id="@+id/mini_player_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <FrameLayout
-                android:id="@+id/close_layout"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:layout_alignParentEnd="true">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:src="@drawable/player_hide" />
-            </FrameLayout>
-        </RelativeLayout>
-    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
-
-    <nl.joery.animatedbottombar.AnimatedBottomBar
-        android:id="@+id/bottom_bar"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/player_wrapper_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#FFF"
-        app:abb_indicatorAppearance="invisible"
-        app:abb_indicatorHeight="4dp"
-        app:abb_indicatorMargin="16dp"
-        app:abb_selectedIndex="0"
-        app:abb_selectedTabType="text"
-        app:abb_tabs="@menu/main_tabs" />
-</RelativeLayout>
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="62dp">
+
+        <include
+            android:id="@+id/bottom_sheet_player_layout"
+            layout="@layout/bottom_sheet_player_layout" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>
 
 

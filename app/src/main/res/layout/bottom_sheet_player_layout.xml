@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:behavior_hideable="false"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <com.eq.earthquakeplayer3.custom.SongPlayerView
+            android:id="@+id/song_player_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="52dp" />
+
+        <com.eq.earthquakeplayer3.custom.MiniPlayerView
+            android:id="@+id/mini_player_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <FrameLayout
+            android:id="@+id/close_layout"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_alignParentEnd="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/player_hide" />
+        </FrameLayout>
+    </RelativeLayout>
+</FrameLayout>
+
+
