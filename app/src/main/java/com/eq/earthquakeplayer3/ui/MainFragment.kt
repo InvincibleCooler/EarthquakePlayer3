@@ -10,7 +10,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.fragment.app.activityViewModels
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.eq.earthquakeplayer3.BaseFragment
@@ -22,7 +21,6 @@ import com.eq.earthquakeplayer3.custom.SongPlayerView
 import com.eq.earthquakeplayer3.data.SongData
 import com.eq.earthquakeplayer3.ext.stateName
 import com.eq.earthquakeplayer3.utils.ScreenUtils
-import com.eq.earthquakeplayer3.viewmodel.SongPlayerViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import nl.joery.animatedbottombar.AnimatedBottomBar
 
@@ -45,12 +43,6 @@ class MainFragment : BaseFragment() {
 
     private var bottomBarHeight = 0f
 
-    /**
-     * fragment간의 데이터 교환을 위해서 사용함
-     * SongListFragment에서 세팅한 데이터를 MainFragment의 플레이어에 전달하기 위해서 activityViewModels를 사용한다.
-     */
-    private val viewModel: SongPlayerViewModel by activityViewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pagerAdapter = MainPagerAdapter(childFragmentManager)
@@ -64,7 +56,7 @@ class MainFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        viewModel.songData.observe(viewLifecycleOwner) {
+        songPlayerViewModel.songData.observe(viewLifecycleOwner) {
             if (it != null) {
                 updatePlayerUi(it)
                 updateMiniPlayerUi(it)
