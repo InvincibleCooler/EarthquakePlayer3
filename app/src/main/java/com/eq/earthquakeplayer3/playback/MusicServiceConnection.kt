@@ -29,6 +29,9 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
     val isConnected = MutableLiveData<Boolean>().apply {
         postValue(false)
     }
+    val playbackState = MutableLiveData<PlaybackStateCompat>().apply {
+        postValue(PLAYBACK_STATE_NONE)
+    }
 
     private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(context)
     private val mediaBrowser = MediaBrowserCompat(context, serviceComponent, mediaBrowserConnectionCallback, null).apply {
@@ -36,6 +39,8 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
         connect()
     }
     private lateinit var mediaController: MediaControllerCompat
+    val transportControls: MediaControllerCompat.TransportControls
+        get() = mediaController.transportControls
 
     private inner class MediaBrowserConnectionCallback(private val context: Context) : MediaBrowserCompat.ConnectionCallback() {
         /**
@@ -71,6 +76,7 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             Log.d(TAG, "onPlaybackStateChanged state : $state")
+            playbackState.postValue(state ?: PLAYBACK_STATE_NONE)
         }
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
@@ -81,4 +87,9 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
             Log.d(TAG, "onSessionDestroyed")
         }
     }
+
+    @Suppress("PropertyName")
+    val PLAYBACK_STATE_NONE: PlaybackStateCompat = PlaybackStateCompat.Builder()
+        .setState(PlaybackStateCompat.STATE_NONE, 0, 0f)
+        .build()
 }
