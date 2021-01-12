@@ -1,6 +1,7 @@
 package com.eq.earthquakeplayer3.ui
 
 import android.os.Bundle
+import android.support.v4.media.session.PlaybackStateCompat
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +20,8 @@ import com.eq.earthquakeplayer3.custom.MiniPlayerView
 import com.eq.earthquakeplayer3.custom.SongPlayerControlView
 import com.eq.earthquakeplayer3.custom.SongPlayerView
 import com.eq.earthquakeplayer3.data.SongData
+import com.eq.earthquakeplayer3.ext.isPlayEnabled
+import com.eq.earthquakeplayer3.ext.isPlaying
 import com.eq.earthquakeplayer3.ext.stateName
 import com.eq.earthquakeplayer3.utils.ScreenUtils
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -60,6 +63,17 @@ class MainFragment : BaseFragment() {
             if (it != null) {
                 updatePlayerUi(it)
                 updateMiniPlayerUi(it)
+            }
+        }
+        songPlayerViewModel.musicServiceConnection.playbackState.observe(viewLifecycleOwner) {
+            if (it.state == PlaybackStateCompat.STATE_BUFFERING) {
+                songPlayerViewModel.musicServiceConnection.transportControls.play()
+            }
+
+            if (it.isPlaying) {
+                updatePlayButton(true)
+            } else if (it.state == PlaybackStateCompat.STATE_PAUSED) {
+                updatePlayButton(false)
             }
         }
         return inflater.inflate(R.layout.fragment_main, container, false)
@@ -190,6 +204,7 @@ class MainFragment : BaseFragment() {
                     }
 
                     override fun onPlayClick() {
+                        playMedia(songData.data)
                     }
 
                     override fun onNextClick() {
@@ -198,8 +213,6 @@ class MainFragment : BaseFragment() {
             }
         }
     }
-
-    private var isPlaying = false
 
     private fun updateMiniPlayerUi(songData: SongData) {
         miniPlayerLayout.run {
@@ -210,12 +223,21 @@ class MainFragment : BaseFragment() {
                 }
 
                 override fun onPlayClick() {
-//                    togglePlayOrPause(!isPlaying)
+                    playMedia(songData.data)
                 }
 
                 override fun onNextClick() {
                 }
             }
         }
+    }
+
+    private fun playMedia(uriPath: String?) {
+        songPlayerViewModel.playMedia(uriPath)
+    }
+
+    private fun updatePlayButton(isPlaying: Boolean) {
+        songPlayerLayout.controlView.updatePlayButton(isPlaying)
+        miniPlayerLayout.updatePlayButton(isPlaying)
     }
 }

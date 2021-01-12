@@ -47,4 +47,8 @@ class SongPlayerControlView : LinearLayout {
             listener?.onNextClick()
         }
     }
+
+    fun updatePlayButton(isPlaying: Boolean) {
+        btnPlayIv.setImageResource(if (isPlaying) R.drawable.player_pause else R.drawable.player_play)
+    }
 }

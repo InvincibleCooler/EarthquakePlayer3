@@ -53,7 +53,7 @@ class MiniPlayerView : LinearLayout {
         }
     }
 
-    fun togglePlayOrPause(isPlaying: Boolean) {
+    fun updatePlayButton(isPlaying: Boolean) {
         btnPlayIv.setImageResource(if (isPlaying) R.drawable.pause else R.drawable.play)
     }
 

@@ -1,5 +1,6 @@
 package com.eq.earthquakeplayer3.playback
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -8,6 +9,8 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
+import com.eq.earthquakeplayer3.ext.stateName
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,22 +60,7 @@ class MusicService : MediaBrowserServiceCompat() {
 
     private fun createPlayer(): EqPlayer {
         Log.d(TAG, "createPlayer")
-        player = EqPlayer(this).also {
-            it.callback = object : EqPlayer.Callback {
-                override fun onCompletion() {
-                    Log.d(TAG, "onCompletion()")
-                }
-
-                override fun onPlaybackStateChanged(playWhenReady: Boolean, state: Int) {
-                    Log.d(TAG, "onExoPlayerPlaybackStateChanged playWhenReady : $playWhenReady, state : ${player.stateName(state)}")
-                }
-
-                override fun onError(error: String) {
-                    Log.d(TAG, "onError error : $error")
-                }
-
-            }
-        }
+        player = EqPlayer(this)
         return player
     }
 
@@ -90,12 +78,15 @@ class MusicService : MediaBrowserServiceCompat() {
         mediaController = MediaControllerCompat(this, mediaSession).also {
             it.registerCallback(object : MediaControllerCompat.Callback() {
                 override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-                    Log.d(TAG, "MediaControllerCompat onMetadataChanged")
+                    mediaController.playbackState?.let { state ->
+                        Log.d(TAG, "MediaControllerCallback onMetadataChanged state : ${state.stateName}")
+                    }
                 }
 
                 override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-                    val currentPlaybackState = state?.state ?: PlaybackStateCompat.STATE_NONE
-                    Log.d(TAG, "MediaControllerCallback currentPlaybackState state : $currentPlaybackState")
+                    state?.let { state ->
+                        Log.d(TAG, "MediaControllerCallback onPlaybackStateChanged state : ${state.stateName}")
+                    }
                 }
             })
         }
@@ -126,9 +117,24 @@ class MusicService : MediaBrowserServiceCompat() {
     override fun onDestroy() {
         super.onDestroy()
 
+        mediaSession.run {
+            isActive = false
+            release()
+        }
         // Cancel coroutines when the service is going away.
         serviceJob.cancel()
-        mediaSession.release()
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        /**
+         * By stopping playback, the player will transition to [Player.STATE_IDLE]. This will
+         * cause a state change in the MediaSession, and (most importantly) call
+         * [MediaControllerCallback.onPlaybackStateChanged]. Because the playback state will
+         * be reported as [PlaybackStateCompat.STATE_NONE], the service will first remove
+         * itself as a foreground service, and will then call [stopSelf].
+         */
+        player.stop(true)
     }
 
 }

@@ -87,9 +87,9 @@ class MusicServiceConnection(context: Context, serviceComponent: ComponentName) 
             Log.d(TAG, "onSessionDestroyed")
         }
     }
-
-    @Suppress("PropertyName")
-    val PLAYBACK_STATE_NONE: PlaybackStateCompat = PlaybackStateCompat.Builder()
-        .setState(PlaybackStateCompat.STATE_NONE, 0, 0f)
-        .build()
 }
+
+@Suppress("PropertyName")
+val PLAYBACK_STATE_NONE: PlaybackStateCompat = PlaybackStateCompat.Builder()
+    .setState(PlaybackStateCompat.STATE_NONE, 0, 0f)
+    .build()
