@@ -94,6 +94,13 @@ class MainFragment : BaseFragment() {
                     }
                     closeLayout.run {
                         alpha = slideOffset
+                        if (alpha == 0f) {
+                            visibility = View.GONE
+                        } else {
+                            if (visibility == View.GONE) {
+                                visibility = View.VISIBLE
+                            }
+                        }
                     }
                     bottomBar.run {
                         translationY = bottomBarHeight * slideOffset
@@ -167,8 +174,10 @@ class MainFragment : BaseFragment() {
         closeLayout.run {
             if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 alpha = 0f
+                visibility = View.GONE
             } else if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 alpha = 1f
+                visibility = View.VISIBLE
             }
         }
         bottomBar.run {

@@ -5,12 +5,12 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.eq.earthquakeplayer3.R
 
 
-class MiniPlayerView : LinearLayout {
+class MiniPlayerView(context: Context, attributeSet: AttributeSet) : RelativeLayout(context, attributeSet) {
     companion object {
         const val TAG = "MiniPlayerView"
     }
@@ -29,29 +29,26 @@ class MiniPlayerView : LinearLayout {
     private lateinit var btnPlayIv: ImageView
     private lateinit var btnNextIv: ImageView
 
-    constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet) {
+    init {
         init(context)
     }
 
     private fun init(context: Context) {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = inflater.inflate(R.layout.miniplayer_laytout, this, true)
+        LayoutInflater.from(context).inflate(R.layout.miniplayer_laytout, this, true)
 
-        titleTv = view.findViewById(R.id.title_tv)
-        artistTv = view.findViewById(R.id.artist_tv)
-        btnPrevIv = view.findViewById(R.id.previous_iv)
-        btnPlayIv = view.findViewById(R.id.play_iv)
-        btnNextIv = view.findViewById(R.id.next_iv)
+        titleTv = findViewById(R.id.title_tv)
+        artistTv = findViewById(R.id.artist_tv)
+        btnPrevIv = findViewById(R.id.previous_iv)
+        btnPlayIv = findViewById(R.id.play_iv)
+        btnNextIv = findViewById(R.id.next_iv)
 
         btnPrevIv.setOnClickListener {
-            Log.d(TAG, "onClickPrevious")
             listener?.onClickPrevious()
         }
         btnPlayIv.setOnClickListener {
             listener?.onClickPlay()
         }
         btnNextIv.setOnClickListener {
-            Log.d(TAG, "onClickNext")
             listener?.onClickNext()
         }
     }
