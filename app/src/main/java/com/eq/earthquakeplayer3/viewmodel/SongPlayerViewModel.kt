@@ -44,6 +44,14 @@ class SongPlayerViewModel(app: Application, val musicServiceConnection: MusicSer
         }
     }
 
+    fun skipToPrevious() {
+        musicServiceConnection.transportControls.skipToPrevious()
+    }
+
+    fun skipToNext() {
+        musicServiceConnection.transportControls.skipToNext()
+    }
+
     class Factory(
         private val app: Application,
         private val musicServiceConnection: MusicServiceConnection

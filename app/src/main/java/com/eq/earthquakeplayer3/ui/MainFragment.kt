@@ -200,14 +200,16 @@ class MainFragment : BaseFragment() {
 
             controlView.run {
                 listener = object : SongPlayerControlView.Callback {
-                    override fun onPreviousClick() {
+                    override fun onClickPrevious() {
+                        skipToPrevious()
                     }
 
-                    override fun onPlayClick() {
+                    override fun onClickPlay() {
                         playMedia(songData.data)
                     }
 
-                    override fun onNextClick() {
+                    override fun onClickNext() {
+                        skipToNext()
                     }
                 }
             }
@@ -219,14 +221,16 @@ class MainFragment : BaseFragment() {
             setSongName(songData.title)
             setArtistName(songData.artistName)
             listener = object : MiniPlayerView.Callback {
-                override fun onPreviousClick() {
+                override fun onClickPrevious() {
+                    skipToPrevious()
                 }
 
-                override fun onPlayClick() {
+                override fun onClickPlay() {
                     playMedia(songData.data)
                 }
 
-                override fun onNextClick() {
+                override fun onClickNext() {
+                    skipToNext()
                 }
             }
         }
@@ -234,6 +238,14 @@ class MainFragment : BaseFragment() {
 
     private fun playMedia(uriPath: String?) {
         songPlayerViewModel.playMedia(uriPath)
+    }
+
+    private fun skipToPrevious() {
+        songPlayerViewModel.skipToPrevious()
+    }
+
+    private fun skipToNext() {
+        songPlayerViewModel.skipToNext()
     }
 
     private fun updatePlayButton(isPlaying: Boolean) {

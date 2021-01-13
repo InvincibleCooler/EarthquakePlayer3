@@ -14,9 +14,9 @@ class SongPlayerControlView : LinearLayout {
     }
 
     interface Callback {
-        fun onPreviousClick()
-        fun onPlayClick()
-        fun onNextClick()
+        fun onClickPrevious()
+        fun onClickPlay()
+        fun onClickNext()
     }
 
     var listener: Callback? = null
@@ -38,13 +38,13 @@ class SongPlayerControlView : LinearLayout {
         btnNextIv = view.findViewById(R.id.next_iv)
 
         btnPrevIv.setOnClickListener {
-            listener?.onPreviousClick()
+            listener?.onClickPrevious()
         }
         btnPlayIv.setOnClickListener {
-            listener?.onPlayClick()
+            listener?.onClickPlay()
         }
         btnNextIv.setOnClickListener {
-            listener?.onNextClick()
+            listener?.onClickNext()
         }
     }
 
