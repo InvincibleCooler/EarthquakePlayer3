@@ -1,6 +1,7 @@
 package com.eq.earthquakeplayer3.ui
 
 import android.os.Bundle
+import android.support.v4.media.session.PlaybackStateCompat
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,7 +11,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.fragment.app.activityViewModels
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.eq.earthquakeplayer3.BaseFragment
@@ -20,9 +20,11 @@ import com.eq.earthquakeplayer3.custom.MiniPlayerView
 import com.eq.earthquakeplayer3.custom.SongPlayerControlView
 import com.eq.earthquakeplayer3.custom.SongPlayerView
 import com.eq.earthquakeplayer3.data.SongData
+import com.eq.earthquakeplayer3.ext.isPlayEnabled
+import com.eq.earthquakeplayer3.ext.isPlaying
+import com.eq.earthquakeplayer3.ext.stateName
 import com.eq.earthquakeplayer3.utils.ScreenUtils
-import com.eq.earthquakeplayer3.viewmodel.SongPlayerViewModel
-import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import nl.joery.animatedbottombar.AnimatedBottomBar
 
 
@@ -33,7 +35,7 @@ class MainFragment : BaseFragment() {
 
     private lateinit var pagerAdapter: MainPagerAdapter
 
-    private lateinit var slidingLayout: SlidingUpPanelLayout
+    private lateinit var behavior: BottomSheetBehavior<*>
     private lateinit var viewPager: ViewPager
     private lateinit var bottomBar: AnimatedBottomBar
 
@@ -43,12 +45,6 @@ class MainFragment : BaseFragment() {
     private lateinit var closeLayout: View
 
     private var bottomBarHeight = 0f
-
-    /**
-     * fragment간의 데이터 교환을 위해서 사용함
-     * SongListFragment에서 세팅한 데이터를 MainFragment의 플레이어에 전달하기 위해서 activityViewModels를 사용한다.
-     */
-    private val viewModel: SongPlayerViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,10 +59,21 @@ class MainFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        viewModel.songData.observe(viewLifecycleOwner) {
+        songPlayerViewModel.songData.observe(viewLifecycleOwner) {
             if (it != null) {
                 updatePlayerUi(it)
                 updateMiniPlayerUi(it)
+            }
+        }
+        songPlayerViewModel.musicServiceConnection.playbackState.observe(viewLifecycleOwner) {
+            if (it.state == PlaybackStateCompat.STATE_BUFFERING) {
+                songPlayerViewModel.musicServiceConnection.transportControls.play()
+            }
+
+            if (it.isPlaying) {
+                updatePlayButton(true)
+            } else if (it.state == PlaybackStateCompat.STATE_PAUSED) {
+                updatePlayButton(false)
             }
         }
         return inflater.inflate(R.layout.fragment_main, container, false)
@@ -75,12 +82,13 @@ class MainFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        slidingLayout = view.findViewById(R.id.sliding_layout)
-        slidingLayout.run {
-            setClickEnable(panelState == SlidingUpPanelLayout.PanelState.COLLAPSED)
+        behavior = BottomSheetBehavior.from(view.findViewById(R.id.bottom_sheet_player_layout)).apply {
+            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    Log.d(TAG, "newState : $stateName")
+                }
 
-            addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
-                override fun onPanelSlide(panel: View?, slideOffset: Float) {
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
                     miniPlayerLayout.run {
                         alpha = (1 - slideOffset)
                     }
@@ -91,24 +99,7 @@ class MainFragment : BaseFragment() {
                         translationY = bottomBarHeight * slideOffset
                     }
                 }
-
-                override fun onPanelStateChanged(panel: View?, previousState: SlidingUpPanelLayout.PanelState?, newState: SlidingUpPanelLayout.PanelState?) {
-                    when (newState) {
-                        SlidingUpPanelLayout.PanelState.COLLAPSED -> {
-                            setClickEnable(true)
-                        }
-                        SlidingUpPanelLayout.PanelState.EXPANDED -> {
-                            setClickEnable(false)
-                        }
-                        else -> {
-                        }
-                    }
-                }
             })
-
-            setFadeOnClickListener { // v 버튼 더블클릭 방지 차원
-                click2Collapsed()
-            }
         }
 
         viewPager = view.findViewById(R.id.view_pager)
@@ -121,10 +112,17 @@ class MainFragment : BaseFragment() {
 
         songPlayerLayout = view.findViewById(R.id.song_player_layout)
         miniPlayerLayout = view.findViewById(R.id.mini_player_layout)
+        miniPlayerLayout.run {
+            setOnClickListener {
+                if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED)
+                    click2Collapsed(false)
+            }
+        }
+
         closeLayout = view.findViewById(R.id.close_layout)
         closeLayout.run {
             setOnClickListener {
-                click2Collapsed()
+                click2Collapsed(true)
             }
         }
 
@@ -145,15 +143,8 @@ class MainFragment : BaseFragment() {
         }
     }
 
-    private fun setClickEnable(clickable: Boolean) {
-        slidingLayout.run {
-            isTouchEnabled = clickable
-        }
-    }
-
-    private fun click2Collapsed() {
-        setClickEnable(true)
-        slidingLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+    private fun click2Collapsed(isCollapsed: Boolean) {
+        behavior.state = if (isCollapsed) BottomSheetBehavior.STATE_COLLAPSED else BottomSheetBehavior.STATE_EXPANDED
     }
 
     /**
@@ -162,34 +153,36 @@ class MainFragment : BaseFragment() {
      * bottomBar는 애니메이션 처리가 있기 때문에 재설정이 필요함.
      */
     private fun setLayout() {
+        if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            behavior.peekHeight = bottomBarHeight.toInt()
+        }
+
         miniPlayerLayout.run {
-            if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 alpha = 1f
-            } else if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            } else if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 alpha = 0f
             }
         }
         closeLayout.run {
-            if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 alpha = 0f
-            } else if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            } else if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 alpha = 1f
             }
         }
         bottomBar.run {
-            if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 translationY = 0f
-            } else if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            } else if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 translationY = bottomBarHeight
             }
         }
     }
 
     private fun performBackPress() {
-        if (slidingLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED
-            || slidingLayout.panelState == SlidingUpPanelLayout.PanelState.ANCHORED
-        ) {
-            slidingLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+        if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
             (activity as MainActivity).finish()
         }
@@ -207,36 +200,56 @@ class MainFragment : BaseFragment() {
 
             controlView.run {
                 listener = object : SongPlayerControlView.Callback {
-                    override fun onPreviousClick() {
+                    override fun onClickPrevious() {
+                        skipToPrevious()
                     }
 
-                    override fun onPlayClick() {
+                    override fun onClickPlay() {
+                        playMedia(songData.data)
                     }
 
-                    override fun onNextClick() {
+                    override fun onClickNext() {
+                        skipToNext()
                     }
                 }
             }
         }
     }
 
-    private var isPlaying = false
-
     private fun updateMiniPlayerUi(songData: SongData) {
         miniPlayerLayout.run {
             setSongName(songData.title)
             setArtistName(songData.artistName)
             listener = object : MiniPlayerView.Callback {
-                override fun onPreviousClick() {
+                override fun onClickPrevious() {
+                    skipToPrevious()
                 }
 
-                override fun onPlayClick() {
-//                    togglePlayOrPause(!isPlaying)
+                override fun onClickPlay() {
+                    playMedia(songData.data)
                 }
 
-                override fun onNextClick() {
+                override fun onClickNext() {
+                    skipToNext()
                 }
             }
         }
+    }
+
+    private fun playMedia(uriPath: String?) {
+        songPlayerViewModel.playMedia(uriPath)
+    }
+
+    private fun skipToPrevious() {
+        songPlayerViewModel.skipToPrevious()
+    }
+
+    private fun skipToNext() {
+        songPlayerViewModel.skipToNext()
+    }
+
+    private fun updatePlayButton(isPlaying: Boolean) {
+        songPlayerLayout.controlView.updatePlayButton(isPlaying)
+        miniPlayerLayout.updatePlayButton(isPlaying)
     }
 }

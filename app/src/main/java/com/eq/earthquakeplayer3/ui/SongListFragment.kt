@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +17,6 @@ import com.eq.earthquakeplayer3.R
 import com.eq.earthquakeplayer3.data.SongData
 import com.eq.earthquakeplayer3.data.SongDataMgr
 import com.eq.earthquakeplayer3.viewmodel.SongListViewModel
-import com.eq.earthquakeplayer3.viewmodel.SongPlayerViewModel
 
 
 class SongListFragment : BaseFragment() {
@@ -34,8 +32,6 @@ class SongListFragment : BaseFragment() {
     private val viewModel: SongListViewModel by lazy {
         ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory(EqApp.instance)).get(SongListViewModel::class.java)
     }
-
-    private val songPlayerViewModel: SongPlayerViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

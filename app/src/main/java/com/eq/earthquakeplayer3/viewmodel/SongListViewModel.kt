@@ -72,14 +72,14 @@ class SongListViewModel(app: Application) : AndroidViewModel(app) {
                         val contentUri = ContentUris.withAppendedId(AUDIO_MEDIA_DATA_URI, id).toString()
                         val albumPath = ContentUris.withAppendedId(ALBUM_ART_URI, albumId).toString()
 
-                        Log.d(TAG, "id : $id")
-                        Log.d(TAG, "title : $title")
-                        Log.d(TAG, "artistName : $artistName")
-                        Log.d(TAG, "albumName : $albumName")
-                        Log.d(TAG, "albumId : $albumId")
-                        Log.d(TAG, "duration : $duration")
-                        Log.d(TAG, "contentUri : $contentUri")
-                        Log.d(TAG, "albumPath : $albumPath")
+//                        Log.d(TAG, "id : $id")
+//                        Log.d(TAG, "title : $title")
+//                        Log.d(TAG, "artistName : $artistName")
+//                        Log.d(TAG, "albumName : $albumName")
+//                        Log.d(TAG, "albumId : $albumId")
+//                        Log.d(TAG, "duration : $duration")
+//                        Log.d(TAG, "contentUri : $contentUri")
+//                        Log.d(TAG, "albumPath : $albumPath")
                         songDataList.run {
                             add(SongData(id, title, artistName, albumName, duration, contentUri, albumPath))
                         }

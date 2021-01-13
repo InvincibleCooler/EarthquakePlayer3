@@ -2,6 +2,7 @@ package com.eq.earthquakeplayer3.custom
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -15,9 +16,9 @@ class MiniPlayerView : LinearLayout {
     }
 
     interface Callback {
-        fun onPreviousClick()
-        fun onPlayClick()
-        fun onNextClick()
+        fun onClickPrevious()
+        fun onClickPlay()
+        fun onClickNext()
     }
 
     var listener: Callback? = null
@@ -38,22 +39,24 @@ class MiniPlayerView : LinearLayout {
 
         titleTv = view.findViewById(R.id.title_tv)
         artistTv = view.findViewById(R.id.artist_tv)
-        btnPrevIv = view.findViewById(R.id.btn_mini_prev)
-        btnPlayIv = view.findViewById(R.id.btn_mini_play)
-        btnNextIv = view.findViewById(R.id.btn_mini_next)
+        btnPrevIv = view.findViewById(R.id.previous_iv)
+        btnPlayIv = view.findViewById(R.id.play_iv)
+        btnNextIv = view.findViewById(R.id.next_iv)
 
         btnPrevIv.setOnClickListener {
-            listener?.onPreviousClick()
+            Log.d(TAG, "onClickPrevious")
+            listener?.onClickPrevious()
         }
         btnPlayIv.setOnClickListener {
-            listener?.onPlayClick()
+            listener?.onClickPlay()
         }
         btnNextIv.setOnClickListener {
-            listener?.onNextClick()
+            Log.d(TAG, "onClickNext")
+            listener?.onClickNext()
         }
     }
 
-    fun togglePlayOrPause(isPlaying: Boolean) {
+    fun updatePlayButton(isPlaying: Boolean) {
         btnPlayIv.setImageResource(if (isPlaying) R.drawable.pause else R.drawable.play)
     }
 
